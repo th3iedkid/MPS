@@ -73,8 +73,6 @@ public class Generator extends ReloadableModuleBase {
     }
     SModuleReference mp = new jetbrains.mps.project.structure.modules.ModuleReference(myGeneratorDescriptor.getGeneratorUID(), uuid);
     setModuleReference(mp);
-
-    reloadAfterDescriptorChange();
   }
 
   @Override
@@ -115,10 +113,6 @@ public class Generator extends ReloadableModuleBase {
     languageDescriptor.getGenerators().remove(index);
     languageDescriptor.getGenerators().add(index, (GeneratorDescriptor) moduleDescriptor);
     getSourceLanguage().setModuleDescriptor(languageDescriptor);
-  }
-
-  public String getName() {
-    return myGeneratorDescriptor.getNamespace();
   }
 
   public String getAlias() {

@@ -28,7 +28,7 @@ import jetbrains.mps.nodeEditor.EditorContext;
 import jetbrains.mps.nodeEditor.EditorSettings;
 import jetbrains.mps.nodeEditor.IntelligentInputUtil;
 import jetbrains.mps.nodeEditor.KeyboardHandler;
-import jetbrains.mps.nodeEditor.SubstituteActionUtil;
+import jetbrains.mps.nodeEditor.SubstituteActionComparator;
 import jetbrains.mps.openapi.editor.cells.EditorCell;
 import jetbrains.mps.openapi.editor.cells.SubstituteAction;
 import jetbrains.mps.openapi.editor.cells.SubstituteInfo;
@@ -67,7 +67,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Author: Sergey Dmitriev.
@@ -250,7 +252,74 @@ public class NodeSubstituteChooser implements KeyboardHandler {
       if (myIsSmart) {
         sortSmartActions(matchingActions);
       } else {
-        Collections.sort(matchingActions, SubstituteActionUtil.createComparator(needToTrim ? trimPattern : pattern));
+        Collections.sort(matchingActions, new SubstituteActionComparator(needToTrim ? trimPattern : pattern) {
+          private Map<SubstituteAction, Integer> myLocalSortPrioritiesMap = new HashMap<SubstituteAction, Integer>();
+          private Map<SubstituteAction, Integer> myRatesMap = new HashMap<SubstituteAction, Integer>();
+          private Map<SubstituteAction, String> myVisibleMatchingTextsMap = new HashMap<SubstituteAction, String>();
+          private Map<SubstituteAction, Boolean> myCanSubstituteStrictlyMap = new HashMap<SubstituteAction, Boolean>();
+          private Map<SubstituteAction, Boolean> myStartsWithMap = new HashMap<SubstituteAction, Boolean>();
+          private Map<SubstituteAction, Boolean> myStartsWithLowerCaseMap = new HashMap<SubstituteAction, Boolean>();
+
+          @Override
+          protected int getLocalSortPriority(SubstituteAction action) {
+            Integer priority = myLocalSortPrioritiesMap.get(action);
+            if (priority == null) {
+              priority = super.getLocalSortPriority(action);
+              myLocalSortPrioritiesMap.put(action, priority);
+            }
+            return priority;
+          }
+
+          @Override
+          protected String getVisibleMatchingText(SubstituteAction action) {
+            String visibleText = myVisibleMatchingTextsMap.get(action);
+            if (visibleText == null) {
+              visibleText = super.getVisibleMatchingText(action);
+              myVisibleMatchingTextsMap.put(action, visibleText);
+            }
+            return visibleText;
+          }
+
+          @Override
+          protected boolean canSubstituteStrictly(SubstituteAction action) {
+            Boolean canSubstituteStrictly = myCanSubstituteStrictlyMap.get(action);
+            if (canSubstituteStrictly == null) {
+              canSubstituteStrictly = super.canSubstituteStrictly(action);
+              myCanSubstituteStrictlyMap.put(action, canSubstituteStrictly);
+            }
+            return canSubstituteStrictly;
+          }
+
+          @Override
+          protected int getRate(SubstituteAction action) {
+            Integer rate = myRatesMap.get(action);
+            if (rate == null) {
+              rate = super.getRate(action);
+              myRatesMap.put(action, rate);
+            }
+            return rate;
+          }
+
+          @Override
+          protected boolean startsWith(SubstituteAction action) {
+            Boolean startsWith = myStartsWithMap.get(action);
+            if (startsWith == null) {
+              startsWith = super.startsWith(action);
+              myStartsWithMap.put(action, startsWith);
+            }
+            return startsWith;
+          }
+
+          @Override
+          protected boolean startsWithLowerCase(SubstituteAction action) {
+            Boolean startsWithLowerCase = myStartsWithLowerCaseMap.get(action);
+            if (startsWithLowerCase == null) {
+              startsWithLowerCase = super.startsWithLowerCase(action);
+              myStartsWithLowerCaseMap.put(action, startsWithLowerCase);
+            }
+            return startsWithLowerCase;
+          }
+        });
       }
     } catch (Exception e) {
       LOG.error(e, e);
@@ -500,6 +569,9 @@ public class NodeSubstituteChooser implements KeyboardHandler {
       myScroller.getVerticalScrollBar().setFocusable(false);
 
       myList.setFocusable(false);
+
+      setPosition(PopupWindowPosition.BOTTOM);
+
       setLayout(new AbstractLayoutManager() {
         @Override
         public Dimension preferredLayoutSize(Container parent) {
@@ -520,12 +592,12 @@ public class NodeSubstituteChooser implements KeyboardHandler {
 
     public void done() {
       setRelativeCell(null);
+      setPosition(PopupWindowPosition.BOTTOM);
     }
 
     @Override
     public void dispose() {
       getOwner().removeComponentListener(myComponentListener);
-
       super.dispose();
     }
 
@@ -566,12 +638,10 @@ public class NodeSubstituteChooser implements KeyboardHandler {
       Rectangle deviceBounds = WindowsUtil.findDeviceBoundsAt(location);
 
       Dimension preferredSize = getPreferredSize();
-      if (location.getY() + preferredSize.getHeight() > deviceBounds.height + deviceBounds.y - 150 && location.getY() - getPatternEditor().getHeight() / 2 > deviceBounds.y + deviceBounds.height / 2) {
+      if (getPosition() == PopupWindowPosition.BOTTOM && location.getY() + preferredSize.getHeight() > deviceBounds.height + deviceBounds.y - 150 &&
+          location.getY() - getPatternEditor().getHeight() / 2 > deviceBounds.y + deviceBounds.height / 2) {
         setPosition(PopupWindowPosition.TOP);
-      } else {
-        setPosition(PopupWindowPosition.BOTTOM);
       }
-
 
       if (getPosition() == PopupWindowPosition.TOP && myList.getFixedCellHeight() != 0) {
         double maxHeight = location.getY() - getPatternEditor().getHeight() - deviceBounds.y;

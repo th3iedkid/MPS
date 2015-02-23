@@ -149,12 +149,7 @@ public class Solution extends ReloadableModuleBase {
   }
 
   public String toString() {
-    String namespace = mySolutionDescriptor.getNamespace();
-    if (namespace == null || namespace.length() == 0) {
-      assert myDescriptorFile != null;
-      namespace = myDescriptorFile.getName();
-    }
-    return namespace + " [solution]";
+    return getModuleName() + " [solution]";
   }
 
   public SolutionKind getKind() {

@@ -9,16 +9,18 @@ import jetbrains.mps.smodel.action.NodeSubstituteActionsFactoryContext;
 import jetbrains.mps.internal.collections.runtime.ListSequence;
 import java.util.ArrayList;
 import org.jetbrains.mps.openapi.model.SNode;
+import jetbrains.mps.smodel.adapter.structure.MetaAdapterFactory;
 import jetbrains.mps.lang.smodel.generator.smodelAdapter.SConceptOperations;
 import jetbrains.mps.lang.smodel.generator.smodelAdapter.SNodeOperations;
 import jetbrains.mps.util.Computable;
-import jetbrains.mps.smodel.adapter.structure.MetaAdapterFactory;
-import jetbrains.mps.lang.smodel.generator.smodelAdapter.SLinkOperations;
-import jetbrains.mps.internal.collections.runtime.IWhereFilter;
+import jetbrains.mps.scope.Scope;
+import java.util.Collections;
+import jetbrains.mps.internal.collections.runtime.Sequence;
 import jetbrains.mps.internal.collections.runtime.ISelector;
 import jetbrains.mps.smodel.action.DefaultChildNodeSubstituteAction;
 import org.jetbrains.mps.openapi.model.SModel;
 import jetbrains.mps.smodel.action.SNodeFactoryOperations;
+import jetbrains.mps.lang.smodel.generator.smodelAdapter.SLinkOperations;
 import jetbrains.mps.lang.smodel.generator.smodelAdapter.SPropertyOperations;
 import jetbrains.mps.smodel.presentation.NodePresentationUtil;
 
@@ -26,35 +28,20 @@ public class QueriesGenerated {
   public static List<SubstituteAction> nodeSubstituteActionsBuilder_ActionsFactory_Expression_6434457067211318207(final IOperationContext operationContext, final NodeSubstituteActionsFactoryContext _context) {
     List<SubstituteAction> result = ListSequence.fromList(new ArrayList<SubstituteAction>());
     {
-      SNode outputConcept = SConceptOperations.findConceptDeclaration("jetbrains.mps.baseLanguage.jdk8.structure.SuperInterfaceMethodCall");
+      SNode outputConcept = MetaAdapterFactory.getConcept(0xfdcdc48fbfd84831L, 0xaa765abac2ffa010L, 0x17dbb10eeb72e5d9L, "jetbrains.mps.baseLanguage.jdk8.structure.SuperInterfaceMethodCall").getDeclarationNode();
       SNode childConcept = (SNode) _context.getChildConcept();
       if (SConceptOperations.isSuperConceptOf(SNodeOperations.asSConcept(childConcept), SNodeOperations.asSConcept(outputConcept))) {
         Iterable<SNode> queryResult = new Computable<Iterable<SNode>>() {
           public Iterable<SNode> compute() {
-            List<SNode> classifiers = ListSequence.fromList(new ArrayList<SNode>());
-            SNode ancestor = SNodeOperations.getNodeAncestor(_context.getParentNode(), MetaAdapterFactory.getConcept(0xf3061a5392264cc5L, 0xa443f952ceaf5816L, 0x101d9d3ca30L, "jetbrains.mps.baseLanguage.structure.Classifier"), true, false);
-            if (SNodeOperations.isInstanceOf(ancestor, MetaAdapterFactory.getConcept(0xf3061a5392264cc5L, 0xa443f952ceaf5816L, 0xf8c108ca66L, "jetbrains.mps.baseLanguage.structure.ClassConcept"))) {
-              ListSequence.fromList(classifiers).addSequence(ListSequence.fromList(SLinkOperations.getChildren(SNodeOperations.cast(ancestor, MetaAdapterFactory.getConcept(0xf3061a5392264cc5L, 0xa443f952ceaf5816L, 0xf8c108ca66L, "jetbrains.mps.baseLanguage.structure.ClassConcept")), MetaAdapterFactory.getContainmentLink(0xf3061a5392264cc5L, 0xa443f952ceaf5816L, 0xf8c108ca66L, 0xff2ac0b419L, "implementedInterface"))).where(new IWhereFilter<SNode>() {
-                public boolean accept(SNode it) {
-                  return (SLinkOperations.getTarget(it, MetaAdapterFactory.getReferenceLink(0xf3061a5392264cc5L, 0xa443f952ceaf5816L, 0x101de48bf9eL, 0x101de490babL, "classifier")) != null);
-                }
-              }).select(new ISelector<SNode, SNode>() {
-                public SNode select(SNode it) {
-                  return SLinkOperations.getTarget(it, MetaAdapterFactory.getReferenceLink(0xf3061a5392264cc5L, 0xa443f952ceaf5816L, 0x101de48bf9eL, 0x101de490babL, "classifier"));
-                }
-              }));
-            } else if (SNodeOperations.isInstanceOf(ancestor, MetaAdapterFactory.getConcept(0xf3061a5392264cc5L, 0xa443f952ceaf5816L, 0x101edd46144L, "jetbrains.mps.baseLanguage.structure.Interface"))) {
-              ListSequence.fromList(classifiers).addSequence(ListSequence.fromList(SLinkOperations.getChildren(SNodeOperations.cast(ancestor, MetaAdapterFactory.getConcept(0xf3061a5392264cc5L, 0xa443f952ceaf5816L, 0x101edd46144L, "jetbrains.mps.baseLanguage.structure.Interface")), MetaAdapterFactory.getContainmentLink(0xf3061a5392264cc5L, 0xa443f952ceaf5816L, 0x101edd46144L, 0x101eddadad7L, "extendedInterface"))).where(new IWhereFilter<SNode>() {
-                public boolean accept(SNode it) {
-                  return (SLinkOperations.getTarget(it, MetaAdapterFactory.getReferenceLink(0xf3061a5392264cc5L, 0xa443f952ceaf5816L, 0x101de48bf9eL, 0x101de490babL, "classifier")) != null);
-                }
-              }).select(new ISelector<SNode, SNode>() {
-                public SNode select(SNode it) {
-                  return SLinkOperations.getTarget(it, MetaAdapterFactory.getReferenceLink(0xf3061a5392264cc5L, 0xa443f952ceaf5816L, 0x101de48bf9eL, 0x101de490babL, "classifier"));
-                }
-              }));
+            Scope scope = Scope.getScope(_context.getParentNode(), _context.getCurrentTargetNode(), MetaAdapterFactory.getConcept(0xf3061a5392264cc5L, 0xa443f952ceaf5816L, 0x73048d24d425f35eL, "jetbrains.mps.baseLanguage.structure.SuperInerfaceKind").getDeclarationNode());
+            if (scope == null) {
+              return Collections.emptyList();
             }
-            return classifiers;
+            return Sequence.fromIterable(scope.getAvailableElements("")).select(new ISelector<SNode, SNode>() {
+              public SNode select(SNode it) {
+                return SNodeOperations.cast(it, MetaAdapterFactory.getConcept(0xf3061a5392264cc5L, 0xa443f952ceaf5816L, 0x101d9d3ca30L, "jetbrains.mps.baseLanguage.structure.Classifier"));
+              }
+            });
           }
         }.compute();
         if (queryResult != null) {

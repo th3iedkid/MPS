@@ -93,6 +93,7 @@ public abstract class AbstractModule extends SModuleBase implements EditableSMod
   public static final String CLASSES_GEN = "classes_gen";
   public static final String CLASSES = "classes";
 
+  @Nullable
   protected final IFile myDescriptorFile;
   private SModuleReference myModuleReference;
   private Set<ModelRoot> mySModelRoots = new LinkedHashSet<ModelRoot>();
@@ -121,7 +122,7 @@ public abstract class AbstractModule extends SModuleBase implements EditableSMod
   @Override
   public String getModuleName() {
     assertCanRead();
-    return myModuleReference.getModuleName();
+    return getModuleReference().getModuleName();
   }
 
   @Override
@@ -133,6 +134,9 @@ public abstract class AbstractModule extends SModuleBase implements EditableSMod
     }
     HashSet<SDependency> result = new HashSet<SDependency>();
     final SRepository repo = getRepository();
+    if (repo == null) {
+      throw new IllegalStateException("It is not possible to resolve all declared dependencies with a null repository : module " + this);
+    }
 
     // add declared dependencies
     for (Dependency d : descriptor.getDependencies()) {
@@ -226,13 +230,13 @@ public abstract class AbstractModule extends SModuleBase implements EditableSMod
   //module reference is immutable, so we cn return original
   public SModuleReference getModuleReference() {
     assertCanRead();
-
     return myModuleReference;
   }
 
   //----save
 
   //todo move to EditableModule class
+  @Nullable
   public ModuleDescriptor getModuleDescriptor() {
     assertCanRead();
 
@@ -692,8 +696,23 @@ public abstract class AbstractModule extends SModuleBase implements EditableSMod
   }
 
   @Override
+  public String toString() {
+    String namespace = getModuleName();
+    return namespace + " [module]";
+  }
+
+  /**
+   * @deprecated use {@link #getModuleName}
+   */
+  @Deprecated
+  public String getName() {
+    return getModuleName();
+  }
+
+  @Override
   public void dispose() {
     assertCanChange();
+    LOG.trace("Disposing the module " + this);
     FileSystem.getInstance().removeListener(this);
     for (ModuleFacetBase f : myFacets) {
       f.dispose();

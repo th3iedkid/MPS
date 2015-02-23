@@ -84,7 +84,7 @@ public class Classifier_Behavior {
     SNode thisType = BehaviorReflection.invokeVirtual((Class<SNode>) ((Class) Object.class), thisNode, "virtual_getThisType_7405920559687254782", new Object[]{});
     Iterable<SNode> members = Sequence.fromIterable(IClassifierType_Behavior.call_getMembers_7405920559687277275(thisType)).where(new IWhereFilter<SNode>() {
       public boolean accept(SNode it) {
-        return SNodeOperations.isInstanceOf(it, SNodeOperations.asSConcept(kind));
+        return SNodeOperations.isInstanceOf(it, SNodeOperations.asSConcept(SNodeOperations.asSConcept(kind)));
       }
     });
 
@@ -216,8 +216,8 @@ public class Classifier_Behavior {
     return false;
   }
   public static boolean call_canInstantiateIn_6935810692634457550(SNode thisNode, SNode context) {
-    List<SNode> contextClassifiers = Classifier_Behavior.call_getNonStaticContextClassifiers_6775591514230482802(SNodeOperations.asSConcept(SConceptOperations.findConceptDeclaration("jetbrains.mps.baseLanguage.structure.Classifier")), context);
-    List<SNode> required = Classifier_Behavior.call_getNonStaticContextClassifiers_6775591514230482802(SNodeOperations.asSConcept(SConceptOperations.findConceptDeclaration("jetbrains.mps.baseLanguage.structure.Classifier")), thisNode);
+    List<SNode> contextClassifiers = Classifier_Behavior.call_getNonStaticContextClassifiers_6775591514230482802(SNodeOperations.asSConcept(MetaAdapterFactory.getConcept(0xf3061a5392264cc5L, 0xa443f952ceaf5816L, 0x101d9d3ca30L, "jetbrains.mps.baseLanguage.structure.Classifier")), context);
+    List<SNode> required = Classifier_Behavior.call_getNonStaticContextClassifiers_6775591514230482802(SNodeOperations.asSConcept(MetaAdapterFactory.getConcept(0xf3061a5392264cc5L, 0xa443f952ceaf5816L, 0x101d9d3ca30L, "jetbrains.mps.baseLanguage.structure.Classifier")), thisNode);
     ListSequence.fromList(required).removeElement(thisNode);
     for (final SNode req : required) {
       if (!(ListSequence.fromList(contextClassifiers).any(new IWhereFilter<SNode>() {
@@ -410,7 +410,7 @@ public class Classifier_Behavior {
           if (SConceptOperations.isSubConceptOf(SNodeOperations.asSConcept(kind), MetaAdapterFactory.getInterfaceConcept(0xf3061a5392264cc5L, 0xa443f952ceaf5816L, 0x427c475b3d6201deL, "jetbrains.mps.baseLanguage.structure.StaticKind"))) {
             Iterable<SNode> members = ListSequence.fromList(SNodeOperations.getChildren(thisNode)).where(new IWhereFilter<SNode>() {
               public boolean accept(SNode it) {
-                return SNodeOperations.isInstanceOf(it, MetaAdapterFactory.getInterfaceConcept(0xceab519525ea4f22L, 0x9b92103b95ca8c0cL, 0x110396eaaa4L, "jetbrains.mps.lang.core.structure.INamedConcept")) && SNodeOperations.isInstanceOf(it, SNodeOperations.asSConcept(kind));
+                return SNodeOperations.isInstanceOf(it, MetaAdapterFactory.getInterfaceConcept(0xceab519525ea4f22L, 0x9b92103b95ca8c0cL, 0x110396eaaa4L, "jetbrains.mps.lang.core.structure.INamedConcept")) && SNodeOperations.isInstanceOf(it, SNodeOperations.asSConcept(SNodeOperations.asSConcept(kind)));
               }
             }).select(new ISelector<SNode, SNode>() {
               public SNode select(SNode it) {
@@ -534,7 +534,7 @@ public class Classifier_Behavior {
     return result;
   }
   public static SNode call_getContextClassifier_6172562527426750080(SAbstractConcept thisConcept, SNode expr) {
-    SNode concept = ClassConcept_Behavior.call_getContextClass_8008512149545173402(SNodeOperations.asSConcept(SConceptOperations.findConceptDeclaration("jetbrains.mps.baseLanguage.structure.ClassConcept")), expr);
+    SNode concept = ClassConcept_Behavior.call_getContextClass_8008512149545173402(SNodeOperations.asSConcept(MetaAdapterFactory.getConcept(0xf3061a5392264cc5L, 0xa443f952ceaf5816L, 0xf8c108ca66L, "jetbrains.mps.baseLanguage.structure.ClassConcept")), expr);
     if (concept != null) {
       return concept;
     }
@@ -542,7 +542,7 @@ public class Classifier_Behavior {
   }
   @Deprecated
   public static List<SNode> call_getAccessibleMembers_669019847198843527(SAbstractConcept thisConcept, SNode contextNode, int constraint) {
-    SNode classifier = ClassConcept_Behavior.call_getContextClass_8008512149545173402(SNodeOperations.asSConcept(SConceptOperations.findConceptDeclaration("jetbrains.mps.baseLanguage.structure.ClassConcept")), contextNode);
+    SNode classifier = ClassConcept_Behavior.call_getContextClass_8008512149545173402(SNodeOperations.asSConcept(MetaAdapterFactory.getConcept(0xf3061a5392264cc5L, 0xa443f952ceaf5816L, 0xf8c108ca66L, "jetbrains.mps.baseLanguage.structure.ClassConcept")), contextNode);
     List<SNode> result = new ArrayList<SNode>();
     while (classifier != null) {
       ListSequence.fromList(result).addSequence(Sequence.fromIterable(IClassifiersSearchScopeAdapter.filterMembers(IClassifierType_Behavior.call_getVisibleMembers_6145907390641297279(BehaviorReflection.invokeVirtual((Class<SNode>) ((Class) Object.class), classifier, "virtual_getThisType_7405920559687254782", new Object[]{}), contextNode), constraint)).select(new ISelector<SNode, SNode>() {

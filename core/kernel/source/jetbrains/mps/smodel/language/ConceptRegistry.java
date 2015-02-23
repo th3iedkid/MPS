@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2011 JetBrains s.r.o.
+ * Copyright 2003-2015 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,6 +131,7 @@ public class ConceptRegistry implements CoreComponent, LanguageRegistryListener 
       }
 
       if (descriptor == null) return new IllegalConceptDescriptor(fqName);
+      assert !descriptor.getId().equals(MetaIdFactory.INVALID_CONCEPT_ID);
 
       conceptDescriptors.put(fqName, descriptor);
       return descriptor;
@@ -164,6 +165,7 @@ public class ConceptRegistry implements CoreComponent, LanguageRegistryListener 
       }
 
       if (descriptor == null) return new IllegalConceptDescriptor(id);
+      assert !descriptor.getId().equals(MetaIdFactory.INVALID_CONCEPT_ID);
 
       conceptDescriptorsById.put(id, descriptor);
       return descriptor;
@@ -188,7 +190,7 @@ public class ConceptRegistry implements CoreComponent, LanguageRegistryListener 
       try {
         LanguageRuntime languageRuntime = myLanguageRegistry.getLanguage(NameUtil.namespaceFromConceptFQName(fqName));
         if (languageRuntime == null) {
-          LOG.warn("No language for: " + fqName + ", while looking for behavior descriptor.", new Throwable());
+          LOG.warn("No language for: " + fqName + ", while looking for behavior descriptor.");
         } else {
           final BehaviorAspectDescriptor behaviorAspect = languageRuntime.getAspect(BehaviorAspectDescriptor.class);
           descriptor = behaviorAspect != null ? behaviorAspect.getDescriptor(fqName) : null;
@@ -244,7 +246,7 @@ public class ConceptRegistry implements CoreComponent, LanguageRegistryListener 
         ConstraintsAspectDescriptor constraintsAspectDescriptor;
         if (languageRuntime == null) {
           // Then language was just renamed and was not re-generated then it can happen that it has no
-          LOG.warn("No language for: " + conceptId + ", while looking for constraints descriptor.", new Throwable());
+          LOG.warn("No language for: " + conceptId + ", while looking for constraints descriptor.");
           constraintsAspectDescriptor = ConstraintsAspectInterpreted.getInstance();
         } else {
           constraintsAspectDescriptor = languageRuntime.getAspect(ConstraintsAspectDescriptor.class);
@@ -292,12 +294,12 @@ public class ConceptRegistry implements CoreComponent, LanguageRegistryListener 
       TextGenAspectDescriptor textGenAspectDescriptor;
       if (languageRuntime == null) {
         // Then language was just renamed and was not re-generated then it can happen that it has no
-        LOG.warn(String.format("No language for concept %s, while looking for textgen descriptor.", fqName), new Throwable());
+        LOG.warn(String.format("No language for concept %s, while looking for textgen descriptor.", fqName));
         textGenAspectDescriptor = new TextGenAspectInterpreted();
       } else {
         textGenAspectDescriptor = languageRuntime.getAspect(TextGenAspectDescriptor.class);
       }
-      descriptor = textGenAspectDescriptor.getDescriptor(concept);
+      descriptor = textGenAspectDescriptor != null ? textGenAspectDescriptor.getDescriptor(concept) : null;
 
       if (descriptor == null) {
         descriptor = new DefaultTextGenDescriptor();

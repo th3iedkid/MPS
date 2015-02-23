@@ -5,7 +5,7 @@ package jetbrains.mps.kernel.model;
 import org.jetbrains.mps.openapi.model.SNode;
 import org.jetbrains.annotations.NotNull;
 import jetbrains.mps.smodel.adapter.structure.MetaAdapterFactoryByName;
-import jetbrains.mps.lang.smodel.generator.smodelAdapter.SConceptOperations;
+import jetbrains.mps.smodel.SNodeUtil;
 import jetbrains.mps.smodel.Language;
 import jetbrains.mps.lang.smodel.generator.smodelAdapter.SLinkOperations;
 import jetbrains.mps.smodel.adapter.structure.MetaAdapterFactory;
@@ -33,8 +33,10 @@ public class SModelUtil {
     return MetaAdapterFactoryByName.getConcept(conceptFQName).getDeclarationNode();
   }
   @NotNull
+  @Deprecated
   public static SNode getBaseConcept() {
-    return SConceptOperations.findConceptDeclaration("jetbrains.mps.lang.core.structure.BaseConcept");
+    // Deprecated, use SNodeUtil.concept_BaseConcept nstead! 
+    return (SNode) SNodeUtil.concept_BaseConcept.getDeclarationNode();
   }
   public static Language getDeclaringLanguage(final SNode concept) {
     if (concept == null) {
@@ -127,7 +129,7 @@ public class SModelUtil {
     if (from == null || to == null) {
       return false;
     }
-    if (to == SConceptOperations.findConceptDeclaration("jetbrains.mps.lang.core.structure.BaseConcept")) {
+    if (to == MetaAdapterFactory.getConcept(0xceab519525ea4f22L, 0x9b92103b95ca8c0cL, 0x10802efe25aL, "jetbrains.mps.lang.core.structure.BaseConcept").getDeclarationNode()) {
       return true;
     }
     return isAssignableConcept(NameUtil.nodeFQName(from), NameUtil.nodeFQName(to));

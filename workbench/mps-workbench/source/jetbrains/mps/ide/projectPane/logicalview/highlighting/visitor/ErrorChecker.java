@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2014 JetBrains s.r.o.
+ * Copyright 2003-2015 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package jetbrains.mps.ide.projectPane.logicalview.highlighting.visitor;
 
 import jetbrains.mps.ide.projectPane.logicalview.highlighting.visitor.updates.ErrorStateNodeUpdate;
 import jetbrains.mps.ide.ui.tree.MPSTreeNode;
-import jetbrains.mps.ide.ui.tree.module.NamespaceTextNode;
 import jetbrains.mps.ide.ui.tree.module.ProjectModuleTreeNode;
 import jetbrains.mps.ide.ui.tree.module.ProjectTreeNode;
 import jetbrains.mps.ide.ui.tree.smodel.SModelTreeNode;
@@ -26,13 +25,11 @@ import jetbrains.mps.project.StandaloneMPSProject;
 import jetbrains.mps.project.validation.ModelValidator;
 import jetbrains.mps.project.validation.ModuleValidator;
 import jetbrains.mps.project.validation.ModuleValidatorFactory;
-import jetbrains.mps.smodel.IOperationContext;
-import jetbrains.mps.smodel.ModelAccess;
-import jetbrains.mps.util.Computable;
-import jetbrains.mps.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.mps.openapi.model.SModel;
+import org.jetbrains.mps.openapi.model.SModelReference;
 import org.jetbrains.mps.openapi.module.SModule;
+import org.jetbrains.mps.openapi.module.SModuleReference;
 
 import java.util.Collections;
 import java.util.List;
@@ -44,26 +41,28 @@ public class ErrorChecker extends TreeUpdateVisitor {
 
   @Override
   public void visitModelNode(@NotNull final SModelTreeNode node) {
+    final SModelReference mr = node.getModel().getReference();
     scheduleModelRead(node, new Runnable() {
-       private List<String> getErrors() {
-        final SModel modelDescriptor = node.getModel();
-        if (modelDescriptor == null) return Collections.emptyList();
-        if (!(modelDescriptor.isLoaded())) return Collections.emptyList();
-        return new ModelValidator(modelDescriptor).validate();
-       }
       @Override
       public void run() {
-        schedule(node, new ErrorReport(node, getErrors(), null));
+        final SModel modelDescriptor = mr.resolve(myProject.getRepository());
+        if (modelDescriptor == null || !(modelDescriptor.isLoaded())) {
+          return;
+        }
+        final ModelValidator mv = new ModelValidator(modelDescriptor);
+        mv.validate(myProject.getRepository());
+        schedule(node, new ErrorReport(node, mv.errors(), mv.warnings()));
       }
     });
   }
 
   @Override
   public void visitModuleNode(@NotNull final ProjectModuleTreeNode node) {
+    final SModuleReference mr = node.getModule().getModuleReference();
     scheduleModelRead(node, new Runnable() {
       @Override
       public void run() {
-        SModule module = node.getModule();
+        SModule module = mr.resolve(myProject.getRepository());
         final List<String> errors, warnings;
         if (module == null) {
           errors = warnings = Collections.emptyList();

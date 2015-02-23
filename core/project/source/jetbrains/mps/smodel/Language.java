@@ -310,12 +310,12 @@ public class Language extends ReloadableModuleBase implements MPSModuleOwner, Re
         i.remove();
       }
     }
-    setLanguageDescriptor(myLanguageDescriptor);
+    setModuleDescriptor(myLanguageDescriptor);
     this.reload();
   }
 
   public String toString() {
-    return getModuleDescriptor().getNamespace() + " [lang]";
+    return getModuleName() + " [language]";
   }
 
   public LanguageAspect getAspectForModel(@NotNull org.jetbrains.mps.openapi.model.SModel sm) {
@@ -331,14 +331,15 @@ public class Language extends ReloadableModuleBase implements MPSModuleOwner, Re
     return getLanguageFor(modelDescriptor);
   }
 
+  @Nullable
   public static LanguageAspect getModelAspect(org.jetbrains.mps.openapi.model.SModel sm) {
     if (sm == null) return null;
     SModule module = sm.getModule();
-    if (!(module instanceof Language)) return null;
+    if (!(module instanceof Language)) {
+      return null;
+    }
 
     Language l = (Language) module;
-    if (l.getAspectForModel(sm) == null) return null;
-
     return l.getAspectForModel(sm);
   }
 

@@ -136,20 +136,14 @@ public class ClassLoaderManager implements CoreComponent {
 
   private final ClassLoadingBroadCaster myBroadCaster;
 
-  private final ClassLoadingChecker myClassLoadingChecker = new ClassLoadingChecker();
-
   private final ModuleEventsHandler myRepositoryListener;
 
   public ClassLoaderManager(SRepository repository) {
     myRepository = repository;
     myModulesWatcher = new ModulesWatcher(myRepository, myWatchableCondition);
-    myClassLoadersHolder = new ClassLoadersHolder(myModulesWatcher);
+    myClassLoadersHolder = new ClassLoadersHolder(myRepository, myModulesWatcher);
     myRepositoryListener = new ModuleEventsHandler(repository, myModulesWatcher);
     myBroadCaster = new ClassLoadingBroadCaster(repository.getModelAccess());
-  }
-
-  ClassLoadingChecker getClassLoadingChecker() {
-    return myClassLoadingChecker;
   }
 
   private void addDumbIdeaPluginFacetFactory() {
@@ -164,18 +158,20 @@ public class ClassLoaderManager implements CoreComponent {
   @Override
   public void init() {
     myRepository.getModelAccess().checkWriteAccess();
+
     if (INSTANCE != null) throw new IllegalStateException("ClassLoaderManager is already initialized");
     INSTANCE = this;
-    myClassLoadingChecker.init(this);
     myRepositoryListener.init(this);
+    myClassLoadersHolder.init();
     addDumbIdeaPluginFacetFactory(); // FIXME : it does not belong here
   }
 
   @Override
   public void dispose() {
     myRepository.getModelAccess().checkWriteAccess();
+
+    myClassLoadersHolder.dispose();
     myRepositoryListener.dispose();
-    myClassLoadingChecker.dispose(this);
     INSTANCE = null;
   }
 
@@ -280,11 +276,17 @@ public class ClassLoaderManager implements CoreComponent {
   @Deprecated
   @Nullable
   public ClassLoader getClassLoader(final SModule module) {
-    if (!myLoadableCondition.met(module)) return null;
+    if (!myLoadableCondition.met(module)) {
+      return null;
+    }
 
-    if (myRepository.getModelAccess().canWrite()) refresh();
+    if (myRepository.getModelAccess().canWrite()) {
+      refresh();
+    }
     ReloadableModule reloadableModule = (ReloadableModule) module;
-    if (!myValidCondition.met(reloadableModule)) return null;
+    if (!myValidCondition.met(reloadableModule)) {
+      return null;
+    }
     doLoadModules(Collections.singleton(reloadableModule), new EmptyProgressMonitor());
     return doGetClassLoader(reloadableModule);
   }
@@ -390,7 +392,6 @@ public class ClassLoaderManager implements CoreComponent {
       Set<SModuleReference> modulesToUnload = filterModules(modules, loadedCondition);
       if (modulesToUnload.isEmpty()) return Collections.emptySet();
 
-
       // transitive closure
       Collection<? extends SModuleReference> modulesAndBackDeps = myModulesWatcher.getBackDependencies(modulesToUnload);
       modulesToUnload = filterModules(modulesAndBackDeps, loadedCondition);
@@ -475,8 +476,7 @@ public class ClassLoaderManager implements CoreComponent {
       Collection<ReloadableModule> modulesToReload = new LinkedHashSet();
       for (SModule module : modules) {
         if (!(module instanceof TempModule) && module.getRepository() == null) {
-          throw new IllegalStateException(
-              String.format("Cannot reload the module %s which does not belong to a repository", module));
+          throw new IllegalStateException(String.format("Cannot reload the module %s which does not belong to a repository", module));
         }
         if (module instanceof ReloadableModule) {
           modulesToReload.add((ReloadableModule) module);
@@ -485,7 +485,7 @@ public class ClassLoaderManager implements CoreComponent {
       if (modulesToReload.isEmpty()) return Collections.emptySet();
 
       myModulesWatcher.updateModules(modulesToReload);
-      Collection<ReloadableModuleBase> unloadedModules = unloadModules(myModulesWatcher.getModuleRefs(modulesToReload), monitor.subTask(1));
+      Collection<? extends ReloadableModule> unloadedModules = unloadModules(myModulesWatcher.getModuleRefs(modulesToReload), monitor.subTask(1));
       modulesToReload.addAll(unloadedModules);
       Collection<ReloadableModule> loadedModules = preLoadModules(modulesToReload, monitor.subTask(1));
       myBroadCaster.onReload(loadedModules);
@@ -496,6 +496,7 @@ public class ClassLoaderManager implements CoreComponent {
 
       return new LinkedHashSet<ReloadableModule>(loadedModules);
     } finally {
+      myClassLoadersHolder.scheduleClassLoaderDisposeInEDT();
       monitor.done();
     }
   }
@@ -588,7 +589,7 @@ public class ClassLoaderManager implements CoreComponent {
   private final Condition<ReloadableModule> myValidCondition = new Condition<ReloadableModule>() {
     @Override
     public boolean met(ReloadableModule module) {
-      SModuleReference mRef = ((ReloadableModuleBase) module).getModuleReference();
+      SModuleReference mRef = module.getModuleReference();
       return myWatchableCondition.met(module) && myModulesWatcher.getStatus(mRef).isValid();
     }
   };
@@ -596,7 +597,7 @@ public class ClassLoaderManager implements CoreComponent {
   private final Condition<ReloadableModule> myUnloadedCondition = new Condition<ReloadableModule>() {
     @Override
     public boolean met(ReloadableModule module) {
-      return myClassLoadersHolder.getClassLoadingProgress(module) == UNLOADED;
+      return myClassLoadersHolder.getClassLoadingProgress(module.getModuleReference()) == UNLOADED;
     }
   };
 
@@ -610,7 +611,7 @@ public class ClassLoaderManager implements CoreComponent {
   private final Condition<ReloadableModule> myLoadedCondition = new Condition<ReloadableModule>() {
     @Override
     public boolean met(ReloadableModule module) {
-      return myClassLoadersHolder.getClassLoadingProgress(module) == LOADED;
+      return myClassLoadersHolder.getClassLoadingProgress(module.getModuleReference()) == LOADED;
     }
   };
 }

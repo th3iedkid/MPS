@@ -5895,6 +5895,12 @@
             <ref role="3bR37D" node="1H905DlDUSw" resolve="MPS.OpenAPI" />
           </node>
         </node>
+        <node concept="1SiIV0" id="1WC3z$1bWMd" role="3bR37C">
+          <node concept="3bR9La" id="1WC3z$1bWMe" role="1SiIV1">
+            <property role="3bR36h" value="false" />
+            <ref role="3bR37D" node="1CtrbKI23Wm" resolve="jetbrains.mps.lang.migration" />
+          </node>
+        </node>
       </node>
       <node concept="1E1JtD" id="7Kfy9QB6L25" role="2G$12L">
         <property role="BnDLt" value="true" />
@@ -9836,6 +9842,12 @@
               <ref role="3bR37D" node="mXGwHwhVPj" resolve="JDK" />
             </node>
           </node>
+          <node concept="1SiIV0" id="yuXZmMInc7" role="3bR37C">
+            <node concept="3bR9La" id="yuXZmMInc8" role="1SiIV1">
+              <property role="3bR36h" value="false" />
+              <ref role="3bR37D" node="7Kfy9QB6KYK" resolve="jetbrains.mps.baseLanguage.util" />
+            </node>
+          </node>
         </node>
         <node concept="1SiIV0" id="2a9bszgru_Z" role="3bR37C">
           <node concept="3bR9La" id="2a9bszgru_Y" role="1SiIV1">
@@ -9941,6 +9953,12 @@
           <node concept="3bR9La" id="5Gpnhm8rSMl" role="1SiIV1">
             <property role="3bR36h" value="false" />
             <ref role="3bR37D" node="7Kfy9QB6L8Y" resolve="jetbrains.mps.lang.project" />
+          </node>
+        </node>
+        <node concept="1SiIV0" id="1WC3z$1bZY2" role="3bR37C">
+          <node concept="3bR9La" id="1WC3z$1bZY3" role="1SiIV1">
+            <property role="3bR36h" value="false" />
+            <ref role="3bR37D" node="7Kfy9QB6Lh2" resolve="jetbrains.mps.refactoring.runtime" />
           </node>
         </node>
       </node>
@@ -23553,7 +23571,7 @@
     </node>
     <node concept="26Ea6D" id="2lwFGYOW7EZ" role="2hID6k">
       <property role="2eq24a" value="true" />
-      <property role="26Ea6C" value="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005" />
+      <property role="26Ea6C" value="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5021" />
     </node>
     <node concept="26EafG" id="BJYGrH08Xy" role="26Ea7d">
       <property role="26EafJ" value="lib/branding.jar" />
@@ -23590,7 +23608,7 @@
     </node>
     <node concept="26Ea6D" id="BJYGrH08XG" role="26FZ21">
       <property role="2eq24a" value="true" />
-      <property role="26Ea6C" value="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005" />
+      <property role="26Ea6C" value="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5021" />
     </node>
   </node>
   <node concept="1l3spW" id="4O0hKJpjIUQ">
